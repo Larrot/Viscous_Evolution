@@ -137,7 +137,7 @@ for i in range(N):
 
 
 """ Coefficient of dust recombination """
-dust_size = 1000
+dust_size = 0.1
 
 alpha_g0 = 4.5*10**(-17)*(dust_size/0.1)**(-1)
 
@@ -176,6 +176,23 @@ for t in range(M):
             gama[t][i] = 0
         else:
             gama[t][i] = Ksi[t][i]/(alpha_r[i]*n[t][i])
+            
+betta1 = np.zeros((M, N))
+for t in range(M):
+    for i in range(N):
+        if n[t][i] == 0:
+            betta1[t][i] = 0
+        else:
+            betta1[t][i] = (alpha_g[i]*n[t][i]+2.6*10**(-19))/(2*alpha_r[i]*n[t][i])
+
+
+gama1 = np.zeros((M, N))
+for t in range(M):
+    for i in range(N):
+        if n[t][i] == 0:
+            gama1[t][i] = 0
+        else:
+            gama1[t][i] = 2.6*10**(-19)/(alpha_r[i]*n[t][i])
 
 Xi = np.zeros((M, N))
 Xt = np.zeros((M, N))
@@ -188,7 +205,8 @@ for t in range(M):
 Xr = np.zeros((M, N))
 for t in range(M):
     for i in range(N):
-        Xr[t][i] = 2.6*10**(-19)
+        # Xr[t][i] = 2.6*10**(-19)
+        Xr[t][i] = -betta1[t][i] + (betta1[t][i]**2+gama1[t][i])**(1/2)
 
 
 X = np.zeros((M, N))
