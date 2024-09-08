@@ -42,7 +42,7 @@ R_CR = 100
 
 C1 = (N_A*G*M_sun/(K*MU))**(1/2)*L**(-3/2)
 
-dust_size = 1000
+dust_size = 0.1
 
 alpha_g0 = 4.5*10**(-17)*(dust_size/0.1)**(-1)
 
@@ -110,6 +110,7 @@ def Diff(u, x, t):
         
     
     Xi = -betta(u,x) + (betta(u,x)**2+gama(u,x))**(1/2)
+    
     if u >= 10**(-5):
         Xt = 1.8*10**(-11)*(T(x, u)/1000)**(3/4)*(Nu_K/10**(-7))**(0.5) \
             * (n(u,x)/10**(13))**(-0.5) \
@@ -118,11 +119,27 @@ def Diff(u, x, t):
         Xt = 0
         
     # Radiactive elements ionization
-    Xr = 2.6*10**(-19)
+    Ksi_r = 2.6*10**(-19)
 
+    def betta1(u, x):
+        if u >= 10**(-5):
+            betta = (alpha_g(x, u)*n(u, x)+Ksi_r)/(2*alpha_r(x, u)*n(u, x))
+        else:
+            betta = 0
+        return betta
+        
+    def gama1(u,x):
+        if u >= 10**(-5):
+            gama = Ksi_r/(alpha_r(x, u)*n(u, x))
+        else:
+            gama = 0
+        return gama
+        
+    
+    Xi_r = -betta1(u,x) + (betta1(u,x)**2+gama1(u,x))**(1/2)
     
     
-    X = Xi + Xt + Xr
+    X = Xi + Xt + Xi_r
     if Dead == 0:
         ALPHA = 0.01
     else:
@@ -135,12 +152,3 @@ def Diff(u, x, t):
     D = ALPHA/0.0001*x    
     
     return D
-
-
-
-
-
-
-
-
-
